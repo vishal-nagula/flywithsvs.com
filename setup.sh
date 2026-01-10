@@ -100,13 +100,22 @@ nginx -t
 # Reload Nginx
 systemctl reload nginx
 
-# 4. Setup SSL with Certbot
-echo -e "${GREEN}Obtaining SSL Certificates...${NC}"
-certbot --nginx --non-interactive --agree-tos -m "$EMAIL" -d "$DOMAIN_NAME" -d "www.$DOMAIN_NAME" 
-
-# 5. Deploy Application
+# 4. Deploy Application
 echo -e "${GREEN}Deploying Application...${NC}"
 chmod +x deploy.sh
 ./deploy.sh
 
-echo -e "${GREEN}Setup Complete! Your app should be live at https://$DOMAIN_NAME${NC}"
+# 5. Setup SSL with Certbot
+echo -e "${GREEN}Obtaining SSL Certificates...${NC}"
+set +e # Allow certbot to fail without stopping script
+certbot --nginx --non-interactive --agree-tos -m "$EMAIL" -d "$DOMAIN_NAME" -d "www.$DOMAIN_NAME"
+
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}SSL Setup Complete! Your app is live at https://$DOMAIN_NAME${NC}"
+else
+    echo -e "${GREEN}SSL Setup Failed (likely DNS propagation).${NC}"
+    echo -e "Your app is deployed on HTTP (http://$DOMAIN_NAME)."
+    echo -e "Once DNS propagates, run this to enable HTTPS:"
+    echo -e "  sudo certbot --nginx -d $DOMAIN_NAME -d www.$DOMAIN_NAME"
+fi
+set -e
