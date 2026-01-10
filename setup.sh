@@ -114,9 +114,44 @@ certbot --nginx --non-interactive --agree-tos -m "$EMAIL" -d "$DOMAIN_NAME" -d "
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}SSL Setup Complete! Your app is live at https://$DOMAIN_NAME${NC}"
 else
-    echo -e "${GREEN}SSL Setup Failed (likely DNS propagation).${NC}"
+    echo -e "${GREEN}SSL Setup Failed (likely DNS propagation or Rate Limit).${NC}"
+    echo -e "${GREEN}Reverting to HTTP-only configuration...${NC}"
+    
+    # Re-write config without implicit SSL assumptions (if Certbot messed it up)
+    cat > "$NGINX_CONF" <<EOF
+server {
+    listen 80;
+    server_name $DOMAIN_NAME www.$DOMAIN_NAME;
+
+    # Frontend (SPA)
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
+    }
+
+    # Backend API Proxy
+    location /api/ {
+        proxy_pass $BACKEND_URL;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
+        
+        # Standard proxy headers
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
+EOF
+    systemctl reload nginx
     echo -e "Your app is deployed on HTTP (http://$DOMAIN_NAME)."
-    echo -e "Once DNS propagates, run this to enable HTTPS:"
+    echo -e "Once DNS propagates, run this to enable HTTPS manually:"
     echo -e "  sudo certbot --nginx -d $DOMAIN_NAME -d www.$DOMAIN_NAME"
 fi
 set -e
