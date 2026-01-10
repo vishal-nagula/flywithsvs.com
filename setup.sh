@@ -102,6 +102,7 @@ systemctl reload nginx
 
 # 4. Deploy Application
 echo -e "${GREEN}Deploying Application...${NC}"
+git pull
 chmod +x deploy.sh
 ./deploy.sh
 

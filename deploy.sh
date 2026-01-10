@@ -11,7 +11,7 @@ git pull
 
 # Rebuild and restart container
 echo "Rebuilding and restarting container..."
-docker-compose up -d --build
+docker compose up -d --build
 
 # Prune unused images to save space
 echo "Cleaning up..."
