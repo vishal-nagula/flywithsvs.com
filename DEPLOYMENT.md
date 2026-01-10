@@ -1,6 +1,8 @@
 # Deployment Guide for SVS Home Landing
 
-This guide outlines the steps to deploy the SVS Home Landing application on an Ubuntu server with SSL (HTTPS) enabled.
+This guide outlines the## Step 3: Setup Reverse Proxy and SSL (Certbot) on Host
+
+We will run the application in Docker on port `3000`, and use Nginx on the host machine to handle SSL/HTTPS and forward traffic to the container.
 
 ## Prerequisites
 

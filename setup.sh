@@ -51,6 +51,10 @@ fi
 # 3. Configure Nginx Reverse Proxy
 echo -e "${GREEN}Configuring Nginx Reverse Proxy for $DOMAIN_NAME...${NC}"
 
+# Backend URL (User provided or default)
+BACKEND_URL="http://46.62.217.239:8080"
+echo -e "Using Backend URL: $BACKEND_URL"
+
 NGINX_CONF="/etc/nginx/sites-available/$DOMAIN_NAME"
 
 cat > "$NGINX_CONF" <<EOF
@@ -58,13 +62,29 @@ server {
     listen 80;
     server_name $DOMAIN_NAME www.$DOMAIN_NAME;
 
+    # Frontend (SPA)
     location / {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host \$host;
         proxy_cache_bypass \$http_upgrade;
+    }
+
+    # Backend API Proxy
+    location /api/ {
+        proxy_pass $BACKEND_URL;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
+        
+        # Standard proxy headers
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
     }
 }
 EOF
