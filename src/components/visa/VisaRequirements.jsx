@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
 import Skeleton from '../common/Skeleton';
@@ -13,8 +12,10 @@ const VisaRequirements = ({ onCancel }) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [activePill, setActivePill] = useState(null);
-    const [activeCity, setActiveCity] = useState(null);
+
+    // UI State
+    const [activeTab, setActiveTab] = useState('visaTypes'); // visaTypes, general, diplomatic, help, logistic
+    const [expandedJurisdiction, setExpandedJurisdiction] = useState({}); // { visaTypeIndex: expandedJurisdictionIndex }
 
     // Initial fetch for country list
     useEffect(() => {
@@ -45,13 +46,9 @@ const VisaRequirements = ({ onCancel }) => {
         try {
             const result = await api.getVisaRequirements(code);
             setData(result);
-
-            const firstPill = result.visa ? Object.keys(result.visa)[0] : null;
-            if (firstPill) {
-                setActivePill(firstPill);
-                const firstCity = Object.keys(result.visa[firstPill])[0];
-                setActiveCity(firstCity);
-            }
+            // Reset state on new data
+            setActiveTab('visaTypes');
+            setExpandedJurisdiction({});
         } catch (err) {
             setError(err.message);
             setData(null);
@@ -68,452 +65,391 @@ const VisaRequirements = ({ onCancel }) => {
         setCountryCode(country.code);
         setSearchTerm(country.countryName || country.name || country.code);
         setIsDropdownOpen(false);
-        // fetchRequirements is called by the useEffect on countryCode change
     };
 
-    const handlePillChange = (pill) => {
-        setActivePill(pill);
-        // Reset city to first available in new pill
-        if (data && data.visa && data.visa[pill]) {
-            setActiveCity(Object.keys(data.visa[pill])[0]);
-        }
+    const toggleJurisdiction = (visaTypeIdx, jurisdictionIdx) => {
+        setExpandedJurisdiction(prev => ({
+            ...prev,
+            [`${visaTypeIdx}-${jurisdictionIdx}`]: !prev[`${visaTypeIdx}-${jurisdictionIdx}`]
+        }));
     };
 
-    // Helper to format key names like "Pills-business" -> "Business"
-    const formatPillName = (key) => key.replace('Pills-', '').toUpperCase();
-
-    const currentVisaDetails = data && activePill && activeCity && data.visa && data.visa[activePill] ? data.visa[activePill][activeCity] : null;
-
-    // Strict AWS Cloudscape Design System Tokens
+    // --- AWS & Custom Styles ---
     const AWS = {
-        // Foundation
-        colorBackgroundLayoutMain: '#f2f3f3',
-        colorBackgroundContainerContent: '#ffffff',
-        colorBorderContainerTop: '#eaeded', // slightly lighter for separators
-        colorBorderInputDefault: '#7d8998', // darker input border
-        colorBorderItemFocused: '#0972d3', // focus ring
         colorTextBodyDefault: '#16191f',
         colorTextBodySecondary: '#545b64',
-        colorTextLinkDefault: '#0972d3',
-
-        // Buttons
+        colorBorderContainerTop: '#eaeded',
+        colorBackgroundContainerContent: '#ffffff',
         colorBackgroundButtonPrimaryDefault: '#ec7211',
-        colorBackgroundButtonPrimaryHover: '#eb5f07',
-        colorBorderButtonPrimaryDefault: '#ec7211',
-        colorTextButtonPrimaryDefault: '#ffffff',
-
-        colorBackgroundButtonNormalDefault: '#ffffff',
-        colorBorderButtonNormalDefault: '#7d8998',
-        colorTextButtonNormalDefault: '#16191f',
-
-        // Status / Flashbar
-        colorBackgroundStatusInfo: '#f1faff',
-        colorBorderStatusInfo: '#0073bb',
-        colorTextStatusInfo: '#0073bb',
-
-        colorBackgroundStatusWarning: '#fffcf5', // warm light bg
-        colorBorderStatusWarning: '#986c23', // darker gold
-        colorTextStatusWarning: '#4d370f', // dark brown text
-
-        colorBackgroundStatusError: '#fff5f5',
-        colorBorderStatusError: '#d13212',
-        colorTextStatusError: '#d13212',
+        blue: '#0972d3',
+        bgLight: '#f2f3f3'
     };
 
-    // Generic Reusable "Container" Style
     const containerStyle = {
         backgroundColor: AWS.colorBackgroundContainerContent,
-        // Modern AWS is simpler:
-        boxShadow: 'none',
         border: '1px solid #d5dbdb',
-        borderRadius: '0px',
-        marginBottom: '20px'
+        borderRadius: '8px',
+        marginBottom: '20px',
+        boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)'
     };
 
-    const headerStyle = {
-        fontSize: '18px',
-        fontWeight: 700,
-        color: AWS.colorTextBodyDefault,
-        padding: '16px 20px',
-        borderBottom: `1px solid ${AWS.colorBorderContainerTop}`,
-        margin: 0
-    };
+    // Helper to safely access nested data
+    const getSections = () => data?.sections || {};
 
-    // Key-Value Pair Component
-    const KeyValue = ({ label, value, large = false }) => (
-        <div style={{ paddingBottom: '10px' }}>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: AWS.colorTextBodySecondary, marginBottom: '4px' }}>{label}</div>
-            <div style={{ fontSize: large ? '24px' : '14px', color: AWS.colorTextBodyDefault, lineHeight: '20px' }}>{value}</div>
-        </div>
+    const TabButton = ({ id, label }) => (
+        <button
+            onClick={() => setActiveTab(id)}
+            style={{
+                background: 'transparent',
+                border: 'none',
+                borderBottom: activeTab === id ? `3px solid ${AWS.colorBackgroundButtonPrimaryDefault}` : '3px solid transparent',
+                padding: '12px 20px',
+                fontSize: '15px',
+                fontWeight: activeTab === id ? 700 : 500,
+                color: activeTab === id ? AWS.colorTextBodyDefault : AWS.colorTextBodySecondary,
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+            }}
+        >
+            {label}
+        </button>
     );
 
     return (
-        <div style={{ padding: '0px', fontFamily: '"Amazon Ember", "Helvetica Neue", Roboto, Arial, sans-serif', backgroundColor: AWS.colorBackgroundLayoutMain, minHeight: '100vh', color: AWS.colorTextBodyDefault }}>
+        <div style={{ padding: '0', backgroundColor: '#f8f9fa', minHeight: '100vh', fontFamily: '"Manrope", sans-serif', color: AWS.colorTextBodyDefault }}>
 
-            {/* Top Navigation Bar Simulation (Service Level) */}
-            <div style={{ padding: '12px 24px', backgroundColor: '#232f3e', color: 'white', display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <span style={{ fontWeight: 700, fontSize: '16px' }}>Visa Service</span>
-                <span style={{ fontSize: '14px', color: '#aab7b8' }}>Region: Global</span>
+            {/* Header / Breadcrumb */}
+            <div style={{ padding: '20px 30px', backgroundColor: 'white', borderBottom: `1px solid ${AWS.colorBorderContainerTop}`, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <h1 style={{ fontSize: '20px', margin: 0, fontWeight: 800 }}>Visa Intelligence Hub</h1>
+                {loading && <i className="fas fa-spinner fa-spin" style={{ color: AWS.colorBackgroundButtonPrimaryDefault }}></i>}
             </div>
 
-            <div style={{ padding: '24px 32px' }}>
+            <div style={{ padding: '30px', maxWidth: '1200px', margin: '0 auto' }}>
 
-                {/* Page Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <div>
-                        <h1 style={{ fontSize: '24px', fontWeight: 700, color: AWS.colorTextBodyDefault, margin: '0 0 8px 0' }}>Visa Requirements</h1>
-                        <p style={{ fontSize: '14px', color: AWS.colorTextBodySecondary, margin: 0 }}>
-                            Search and view entry requirements, fees, and processing times.
-                        </p>
+                {/* Country Search Bar */}
+                <div style={{ display: 'flex', gap: '15px', marginBottom: '30px' }}>
+                    <div style={{ position: 'relative', flex: 1, maxWidth: '400px' }}>
+                        <div
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            style={{
+                                width: '100%',
+                                padding: '12px 16px',
+                                border: '1px solid #d5dbdb',
+                                borderRadius: '6px',
+                                backgroundColor: 'white',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                cursor: 'pointer',
+                                boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
+                            }}
+                        >
+                            <span style={{ fontWeight: 600 }}>
+                                {countryCode ? (
+                                    <>
+                                        <i className="fas fa-globe" style={{ marginRight: '8px', color: '#888' }}></i>
+                                        {countries.find(c => c.code === countryCode)?.countryName || countries.find(c => c.code === countryCode)?.name || countryCode}
+                                    </>
+                                ) : "Select Destination Country..."}
+                            </span>
+                            <i className={`fas fa-chevron-${isDropdownOpen ? 'up' : 'down'}`} style={{ color: '#888' }}></i>
+                        </div>
+
+                        {isDropdownOpen && (
+                            <div style={{
+                                position: 'absolute', top: '110%', left: 0, right: 0,
+                                backgroundColor: 'white', border: '1px solid #d5dbdb', borderRadius: '6px',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 100, maxHeight: '300px',
+                                display: 'flex', flexDirection: 'column'
+                            }}>
+                                <div style={{ padding: '10px' }}>
+                                    <input
+                                        autoFocus
+                                        type="text"
+                                        placeholder="Type to search..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onClick={(e) => e.stopPropagation()}
+                                        style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', outline: 'none' }}
+                                    />
+                                </div>
+                                <div style={{ overflowY: 'auto' }}>
+                                    {filteredCountries.map(country => (
+                                        <div
+                                            key={country.code}
+                                            onClick={() => handleCountrySelect(country)}
+                                            style={{ padding: '10px 15px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', fontSize: '14px' }}
+                                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'}
+                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                        >
+                                            <span style={{ fontWeight: 700, marginRight: '8px', width: '30px', display: 'inline-block' }}>{country.code}</span>
+                                            {country.countryName || country.name}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
+                    {/* Action Buttons Placeholder */}
+
                 </div>
 
-                {/* Main Filter Container */}
-                <div style={containerStyle}>
-                    <div style={headerStyle}>Search Filter</div>
-                    <div style={{ padding: '20px' }}>
-                        <div style={{ maxWidth: '600px' }}>
-                            <label style={{ display: 'block', fontSize: '14px', fontWeight: 700, color: AWS.colorTextBodyDefault, marginBottom: '8px' }}>
-                                Country
-                            </label>
+                {loading ? (
+                    <Skeleton height="300px" />
+                ) : data ? (
+                    <>
+                        {/* Country Header Card */}
+                        <div style={{ ...containerStyle, padding: '24px', position: 'relative' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' }}>
+                                <i className="fas fa-globe" style={{ fontSize: '24px', color: AWS.colorBackgroundButtonPrimaryDefault }}></i>
+                                <h2 style={{ fontSize: '28px', margin: 0, fontWeight: 800 }}>{data.name} <span style={{ fontSize: '18px', fontWeight: 500, color: '#888' }}>({data.code})</span></h2>
+                                <span style={{ marginLeft: 'auto', backgroundColor: '#e6fffa', color: '#047481', padding: '4px 12px', borderRadius: '12px', fontSize: '13px', fontWeight: 700 }}>Active</span>
+                            </div>
 
-                            {/* Custom Dropdown Container */}
-                            <div style={{ position: 'relative' }}>
+                            <p style={{ color: AWS.colorTextBodySecondary, marginBottom: '24px' }}>{getSections().generalInformation?.description || `Visa requirements and information for ${data.name}.`}</p>
 
-                                {/* 1. The Trigger (Select Box) */}
-                                <div
-                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                    style={{
-                                        width: '100%',
-                                        padding: '4px 12px',
-                                        border: `1px solid ${isDropdownOpen ? AWS.colorBorderItemFocused : AWS.colorBorderInputDefault}`,
-                                        borderRadius: '2px',
-                                        backgroundColor: 'white',
-                                        height: '32px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        cursor: 'pointer',
-                                        boxShadow: isDropdownOpen ? `0 0 0 1px ${AWS.colorBorderItemFocused}` : 'none'
-                                    }}
-                                >
-                                    <span style={{ fontSize: '14px', color: countryCode ? AWS.colorTextBodyDefault : '#687078' }}>
-                                        {countryCode ? (countries.find(c => c.code === countryCode)?.countryName || countries.find(c => c.code === countryCode)?.name || countryCode) : "Select country..."}
-                                    </span>
-                                    <i className={`fas fa-caret-${isDropdownOpen ? 'up' : 'down'}`} style={{ color: AWS.colorTextBodySecondary }}></i>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '24px', maxWidth: '500px' }}>
+                                <div>
+                                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Capital</div>
+                                    <div style={{ fontWeight: 600, fontSize: '15px' }}>{getSections().generalInformation?.facts?.Capital || 'N/A'}</div>
                                 </div>
+                                <div>
+                                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Timezone</div>
+                                    <div style={{ fontWeight: 600, fontSize: '15px' }}>{getSections().generalInformation?.facts?.Timezone || 'N/A'}</div>
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Currency</div>
+                                    <div style={{ fontWeight: 600, fontSize: '15px' }}>{data.currency || 'N/A'}</div>
+                                </div>
+                            </div>
+                        </div>
 
-                                {/* 2. The Popover (Search + List) */}
-                                {isDropdownOpen && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '100%',
-                                        left: 0,
-                                        right: 0,
-                                        marginTop: '4px',
-                                        backgroundColor: 'white',
-                                        border: '1px solid #d5dbdb',
-                                        borderRadius: '2px',
-                                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-                                        zIndex: 1000,
-                                        display: 'flex',
-                                        flexDirection: 'column'
-                                    }}>
-                                        {/* Internal Search Input */}
-                                        <div style={{ padding: '8px', borderBottom: '1px solid #eaeded' }}>
-                                            <div style={{ position: 'relative' }}>
-                                                <i className="fas fa-search" style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: '#687078', fontSize: '14px' }}></i>
-                                                <input
-                                                    autoFocus
-                                                    type="text"
-                                                    placeholder="Search country..."
-                                                    value={searchTerm}
-                                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                                    onClick={(e) => e.stopPropagation()} // Prevent closing when clicking input
-                                                    style={{
-                                                        width: '100%',
-                                                        padding: '6px 8px 6px 30px', // Left padding for icon
-                                                        border: '1px solid #7d8998',
-                                                        borderRadius: '2px',
-                                                        fontSize: '14px',
-                                                        outline: 'none'
-                                                    }}
-                                                />
+                        {/* Tabs Navigation */}
+                        <div style={{ backgroundColor: 'white', borderBottom: `1px solid ${AWS.colorBorderContainerTop}`, marginBottom: '20px', borderRadius: '8px', padding: '0 10px' }}>
+                            <TabButton id="visaTypes" label="Visa Types & Fees" />
+                            <TabButton id="general" label="General Info" />
+                            <TabButton id="diplomatic" label="Diplomatic Rep" />
+                            <TabButton id="help" label="Help & Support" />
+                            <TabButton id="logistic" label="Logistic Partner" />
+                        </div>
+
+                        {/* Tab Content Areas */}
+
+                        {/* 1. Visa Types & Fees */}
+                        {activeTab === 'visaTypes' && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                {getSections().visaNotesAndFees?.visaTypes?.map((visa, vIdx) => (
+                                    <div key={vIdx} style={containerStyle}>
+                                        <div style={{ padding: '20px', borderBottom: `1px solid ${AWS.colorBorderContainerTop}`, display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800 }}>{visa.name}</h3>
+                                            <span style={{ fontSize: '12px', border: '1px solid #ddd', padding: '2px 8px', borderRadius: '10px', color: '#666' }}>{visa.code}</span>
+
+                                            <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px' }}>
+                                                <button style={{
+                                                    padding: '8px 16px',
+                                                    backgroundColor: AWS.colorBackgroundButtonPrimaryDefault,
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    borderRadius: '4px',
+                                                    fontWeight: 600,
+                                                    cursor: 'pointer',
+                                                    fontSize: '14px',
+                                                    display: 'flex', alignItems: 'center', gap: '8px'
+                                                }}>
+                                                    Apply Visa
+                                                </button>
+                                                <button style={{
+                                                    padding: '8px 12px',
+                                                    backgroundColor: 'white',
+                                                    border: '1px solid #d5dbdb',
+                                                    borderRadius: '4px',
+                                                    cursor: 'pointer',
+                                                    color: AWS.colorTextBodySecondary
+                                                }} title="Share via Email">
+                                                    <i className="fas fa-envelope"></i>
+                                                </button>
+                                                <button style={{
+                                                    padding: '8px 12px',
+                                                    backgroundColor: 'white',
+                                                    border: '1px solid #d5dbdb',
+                                                    borderRadius: '4px',
+                                                    cursor: 'pointer',
+                                                    color: AWS.colorTextBodySecondary
+                                                }} title="Download PDF">
+                                                    <i className="fas fa-file-pdf"></i>
+                                                </button>
                                             </div>
                                         </div>
 
-                                        {/* List of Countries */}
-                                        <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
-                                            {filteredCountries.length > 0 ? (
-                                                filteredCountries.map(country => (
-                                                    <div
-                                                        key={country.code}
-                                                        onClick={() => handleCountrySelect(country)}
-                                                        style={{
-                                                            padding: '8px 12px',
-                                                            cursor: 'pointer',
-                                                            fontSize: '14px',
-                                                            color: AWS.colorTextBodyDefault,
-                                                            borderBottom: '1px solid transparent'
-                                                        }}
-                                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1faff'}
-                                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
-                                                    >
-                                                        {country.countryName || country.name || country.code}
+                                        <div style={{ padding: '0' }}>
+                                            {visa.jurisdictions?.map((jur, jIdx) => {
+                                                const isExpanded = expandedJurisdiction[`${vIdx}-${jIdx}`];
+                                                return (
+                                                    <div key={jIdx} style={{ borderBottom: jIdx === visa.jurisdictions.length - 1 ? 'none' : `1px solid ${AWS.colorBorderContainerTop}` }}>
+                                                        <div
+                                                            onClick={() => toggleJurisdiction(vIdx, jIdx)}
+                                                            style={{ padding: '20px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: isExpanded ? '#fafafa' : 'white' }}
+                                                        >
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                                                <div style={{ color: AWS.colorBackgroundButtonPrimaryDefault, fontSize: '16px' }}>
+                                                                    <i className="fas fa-map-marker-alt"></i>
+                                                                </div>
+                                                                <div>
+                                                                    <div style={{ fontWeight: 700, fontSize: '16px' }}>{jur.name}</div>
+                                                                    <div style={{ color: '#888', fontSize: '13px' }}>Processing: {jur.processingTime}</div>
+                                                                </div>
+                                                            </div>
+                                                            <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                                                                <div>
+                                                                    <div style={{ fontWeight: 800, fontSize: '16px' }}>{jur.feeCurrency} {(jur.visaFee + jur.logisticFee).toFixed(2)}</div>
+                                                                    <div style={{ fontSize: '11px', color: '#888' }}>Total Fee</div>
+                                                                </div>
+                                                                <i className={`fas fa-chevron-${isExpanded ? 'up' : 'down'}`} style={{ color: '#ccc' }}></i>
+                                                            </div>
+                                                        </div>
+
+                                                        {isExpanded && (
+                                                            <div style={{ padding: '20px 20px 30px 55px', borderTop: '1px dashed #eee' }}>
+                                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+
+                                                                    {/* Fees Breakdown */}
+                                                                    <div>
+                                                                        <h4 style={{ fontSize: '14px', textTransform: 'uppercase', color: '#888', marginBottom: '15px' }}>Fee Breakdown</h4>
+                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '14px' }}>
+                                                                            <span>Visa Fee</span>
+                                                                            <span style={{ fontWeight: 600 }}>{jur.feeCurrency} {jur.visaFee.toFixed(2)}</span>
+                                                                        </div>
+                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '14px' }}>
+                                                                            <span>Logistic/Service Fee</span>
+                                                                            <span style={{ fontWeight: 600 }}>{jur.feeCurrency} {jur.logisticFee.toFixed(2)}</span>
+                                                                        </div>
+                                                                        <div style={{ borderTop: '1px solid #eee', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', fontSize: '15px', fontWeight: 800, color: AWS.colorTextBodyDefault }}>
+                                                                            <span>Total</span>
+                                                                            <span>{jur.feeCurrency} {(jur.visaFee + jur.logisticFee).toFixed(2)}</span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* Documents */}
+                                                                    <div>
+                                                                        <h4 style={{ fontSize: '14px', textTransform: 'uppercase', color: '#888', marginBottom: '15px' }}>Required Documents</h4>
+                                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                                                            {jur.documents?.sort((a, b) => a.displayOrder - b.displayOrder).map((doc, dIdx) => (
+                                                                                <div key={dIdx} style={{ display: 'flex', gap: '10px', fontSize: '14px' }}>
+                                                                                    <i className="fas fa-check-circle" style={{ color: 'green', marginTop: '3px' }}></i>
+                                                                                    <div>
+                                                                                        <div style={{ fontWeight: 600 }}>{doc.name} {doc.mandatory && <span style={{ color: 'red', fontSize: '11px' }}>*</span>}</div>
+                                                                                        {doc.description && doc.description.length > 0 && (
+                                                                                            <ul style={{ margin: '4px 0 0 0', paddingLeft: '15px', color: '#666', fontSize: '13px' }}>
+                                                                                                {doc.description.map((line, lIdx) => (
+                                                                                                    <li key={lIdx}>{line}</li>
+                                                                                                ))}
+                                                                                            </ul>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                ))
-                                            ) : (
-                                                <div style={{ padding: '12px', textAlign: 'center', color: AWS.colorTextBodySecondary, fontSize: '14px' }}>
-                                                    No country found.
-                                                </div>
-                                            )}
+                                                );
+                                            })}
                                         </div>
                                     </div>
-                                )}
+                                ))}
                             </div>
-                        </div>
-                    </div>
-                </div>
+                        )}
 
-                {/* Loading Skeleton */}
-                {loading && (
-                    <div style={{ marginTop: '20px' }}>
-                        <Skeleton height="200px" />
-                    </div>
-                )}
-
-
-                {/* Results Section */}
-                {data && data.visa && !loading && (
-                    <div style={{ marginTop: '20px' }}>
-
-                        {/* Flashbar Area for Alerts */}
-                        {(data.about || data.additional_info || data.logistic_partner_note) && (
-                            <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                {/* Blue Info Flashbar */}
-                                {data.about && (
-                                    <div style={{
-                                        backgroundColor: AWS.colorBackgroundStatusInfo,
-                                        border: `1px solid ${AWS.colorBorderStatusInfo}`,
-                                        padding: '12px 16px', display: 'flex', gap: '12px', borderRadius: '4px'
-                                    }}>
-                                        <i className="fas fa-info-circle" style={{ color: AWS.colorTextStatusInfo, marginTop: '2px' }}></i>
-                                        <div>
-                                            <span style={{ fontWeight: 700, fontSize: '14px', color: AWS.colorTextBodyDefault }}>General Information</span>
-                                            <div style={{ fontSize: '14px', color: AWS.colorTextBodyDefault, marginTop: '4px' }}>{data.about}</div>
-                                        </div>
-                                    </div>
-                                )}
-                                {/* Warning Flashbar */}
-                                {data.additional_info && (
-                                    <div style={{
-                                        backgroundColor: AWS.colorBackgroundStatusWarning,
-                                        border: `1px solid ${AWS.colorBorderStatusWarning}`,
-                                        padding: '12px 16px', display: 'flex', gap: '12px', borderRadius: '4px'
-                                    }}>
-                                        <i className="fas fa-exclamation-triangle" style={{ color: AWS.colorBorderStatusWarning, marginTop: '2px' }}></i>
-                                        <div>
-                                            <span style={{ fontWeight: 700, fontSize: '14px', color: AWS.colorTextBodyDefault }}>Important Notice</span>
-                                            <div style={{ fontSize: '14px', color: AWS.colorTextBodyDefault, marginTop: '4px' }}>{data.additional_info}</div>
-                                        </div>
-                                    </div>
-                                )}
-                                {/* Error/Critical Flashbar */}
-                                {data.logistic_partner_note && (
-                                    <div style={{
-                                        backgroundColor: AWS.colorBackgroundStatusError,
-                                        border: `1px solid ${AWS.colorBorderStatusError}`,
-                                        padding: '12px 16px', display: 'flex', gap: '12px', borderRadius: '4px'
-                                    }}>
-                                        <i className="fas fa-times-circle" style={{ color: AWS.colorTextStatusError, marginTop: '2px' }}></i>
-                                        <div>
-                                            <span style={{ fontWeight: 700, fontSize: '14px', color: AWS.colorTextBodyDefault }}>Partner Note</span>
-                                            <div style={{ fontSize: '14px', color: AWS.colorTextBodyDefault, marginTop: '4px' }}>{data.logistic_partner_note}</div>
-                                        </div>
+                        {/* 2. General Info */}
+                        {activeTab === 'general' && (
+                            <div style={{ ...containerStyle, padding: '30px' }}>
+                                <h3 style={{ marginTop: 0 }}>{getSections().generalInformation?.title}</h3>
+                                <p>{getSections().generalInformation?.description}</p>
+                                {getSections().generalInformation?.workingHours && (
+                                    <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '4px' }}>
+                                        <strong>Standard Working Hours:</strong> {getSections().generalInformation.workingHours.text}
                                     </div>
                                 )}
                             </div>
                         )}
 
-                        {/* Main Details Container with Tabs */}
-                        <div style={containerStyle}>
-                            <div style={headerStyle}>{data.country_name} Visa Configuration</div>
+                        {/* 3. Diplomatic Rep */}
+                        {activeTab === 'diplomatic' && (
+                            <div style={containerStyle}>
+                                {getSections().diplomaticRepresentation?.items?.map((item, idx) => (
+                                    <div key={idx} style={{ padding: '24px', borderBottom: '1px solid #eee' }}>
+                                        <h3 style={{ margin: '0 0 10px 0', fontSize: '18px' }}>{item.name}</h3>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'min-content 1fr', gap: '10px 20px', alignItems: 'center', fontSize: '14px' }}>
+                                            <i className="fas fa-map-marker-alt" style={{ color: '#888' }}></i>
+                                            <span>{item.address}</span>
 
-                            {/* Tabs */}
-                            <div style={{ borderBottom: `1px solid ${AWS.colorBorderContainerTop}`, padding: '0 20px', display: 'flex', gap: '20px' }}>
-                                {Object.keys(data.visa).map(pillKey => (
-                                    <button
-                                        key={pillKey}
-                                        onClick={() => handlePillChange(pillKey)}
-                                        style={{
-                                            border: 'none',
-                                            background: 'transparent',
-                                            padding: '12px 4px',
-                                            fontSize: '14px',
-                                            fontWeight: activePill === pillKey ? 700 : 400,
-                                            color: activePill === pillKey ? AWS.colorTextBodyDefault : AWS.colorTextBodySecondary,
-                                            borderBottom: activePill === pillKey ? `4px solid ${AWS.colorBackgroundButtonPrimaryDefault}` : '4px solid transparent',
-                                            cursor: 'pointer',
-                                            outline: 'none'
-                                        }}
-                                    >
-                                        {formatPillName(pillKey)}
-                                    </button>
-                                ))}
-                            </div>
+                                            {item.phone && (
+                                                <>
+                                                    <i className="fas fa-phone" style={{ color: '#888' }}></i>
+                                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                                        {item.phone.map(p => <span key={p}>{p}</span>)}
+                                                    </div>
+                                                </>
+                                            )}
 
-                            {/* Inner Content Padding */}
-                            <div style={{ padding: '20px' }}>
+                                            {item.email && (
+                                                <>
+                                                    <i className="fas fa-envelope" style={{ color: '#888' }}></i>
+                                                    <a href={`mailto:${item.email}`} style={{ color: AWS.blue }}>{item.email}</a>
+                                                </>
+                                            )}
 
-                                {/* City Selector (Radio Group style) */}
-                                {activePill && data.visa[activePill] && (
-                                    <div style={{ marginBottom: '25px', display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                        <span style={{ fontSize: '14px', fontWeight: 700, color: AWS.colorTextBodyDefault }}>Processing Center:</span>
-                                        <div style={{ display: 'flex', gap: '10px' }}>
-                                            {Object.keys(data.visa[activePill]).map(city => (
-                                                <button
-                                                    key={city}
-                                                    onClick={() => setActiveCity(city)}
-                                                    style={{
-                                                        padding: '4px 12px',
-                                                        border: activeCity === city ? `1px solid ${AWS.colorBorderItemFocused}` : `1px solid ${AWS.colorBorderInputDefault}`,
-                                                        backgroundColor: activeCity === city ? '#e9f2fa' : 'white',
-                                                        color: activeCity === city ? AWS.colorBorderItemFocused : AWS.colorTextBodyDefault,
-                                                        borderRadius: '14px',
-                                                        cursor: 'pointer',
-                                                        fontSize: '14px',
-                                                        fontWeight: activeCity === city ? 700 : 400
-                                                    }}
-                                                >
-                                                    {city}
-                                                </button>
-                                            ))}
+                                            {item.website && (
+                                                <>
+                                                    <i className="fas fa-link" style={{ color: '#888' }}></i>
+                                                    <a href={item.website} target="_blank" rel="noreferrer" style={{ color: AWS.blue }}>{item.website}</a>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
-                                )}
-
-                                {currentVisaDetails && (
-                                    <>
-                                        {/* Key Details Grid - 4 Column Layout */}
-                                        <div style={{ marginBottom: '20px' }}>
-                                            <h4 style={{ fontSize: '16px', fontWeight: 700, color: AWS.colorTextBodyDefault, borderBottom: `1px solid ${AWS.colorBorderContainerTop}`, paddingBottom: '10px', marginTop: 0 }}>
-                                                Financials & Processing
-                                            </h4>
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '24px', marginTop: '15px' }}>
-                                                <KeyValue label="Visa Fee" value={`${currentVisaDetails.visa_fee?.currency} ${currentVisaDetails.visa_fee?.amount}`} large />
-                                                <KeyValue label="Service Charge" value={`${currentVisaDetails.visa_fee?.currency} ${currentVisaDetails.logistic_charges}`} large />
-                                                <KeyValue label="Total Cost" value={`${currentVisaDetails.visa_fee?.currency} ${(parseFloat(currentVisaDetails.visa_fee?.amount || 0) + parseFloat(currentVisaDetails.logistic_charges || 0)).toFixed(2)}`} large />
-                                                <KeyValue label="Processing Time" value={currentVisaDetails.processing_time} large />
-                                            </div>
-                                        </div>
-
-                                        <div style={{ height: '1px', backgroundColor: AWS.colorBorderContainerTop, margin: '20px 0' }}></div>
-
-                                        <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '40px' }}>
-                                            {/* Documents - List View */}
-                                            <div>
-                                                <h4 style={{ fontSize: '16px', fontWeight: 700, color: AWS.colorTextBodyDefault, borderBottom: `1px solid ${AWS.colorBorderContainerTop}`, paddingBottom: '10px', marginTop: 0 }}>
-                                                    Documents Checklist
-                                                </h4>
-                                                <div>
-                                                    {currentVisaDetails.mandatory_documents?.map((doc, idx) => (
-                                                        <div key={idx} style={{ padding: '12px 0', borderBottom: `1px solid ${AWS.colorBorderContainerTop}` }}>
-                                                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                                                                <i className="fas fa-file-alt" style={{ color: AWS.colorTextBodySecondary, marginTop: '3px' }}></i>
-                                                                <div>
-                                                                    <div style={{ fontSize: '14px', fontWeight: 700, color: AWS.colorTextLinkDefault }}>{doc.name}</div>
-                                                                    <div style={{ fontSize: '14px', color: AWS.colorTextBodyDefault, marginTop: '2px' }}>{doc.description}</div>
-                                                                    {doc.links && doc.links.length > 0 && (
-                                                                        <div style={{ marginTop: '6px' }}>
-                                                                            {doc.links.map((link, lidx) => (
-                                                                                <a key={lidx} href={link.url} style={{
-                                                                                    fontSize: '14px', color: AWS.colorTextLinkDefault, textDecoration: 'none', marginRight: '15px',
-                                                                                    display: 'inline-flex', alignItems: 'center', gap: '4px'
-                                                                                }}>
-                                                                                    <i className="fas fa-external-link-alt" style={{ fontSize: '12px' }}></i> {link.text || 'View Resource'}
-                                                                                </a>
-                                                                            ))}
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            {/* Diplomatic Missions - Custom UI from User Reference */}
-                                            <div>
-                                                <h4 style={{ fontSize: '18px', fontWeight: 700, color: AWS.colorTextBodyDefault, marginBottom: '15px', marginTop: 0 }}>
-                                                    Diplomatic Representation
-                                                </h4>
-                                                <div style={{ border: `1px solid ${AWS.colorBorderContainerTop}`, backgroundColor: '#fff', borderRadius: '4px' }}>
-                                                    {data.diplomatic_representations && data.diplomatic_representations.map((rep, idx) => (
-                                                        <div key={idx} style={{
-                                                            padding: '20px',
-                                                            borderBottom: idx === data.diplomatic_representations.length - 1 ? 'none' : `1px solid ${AWS.colorBorderContainerTop}`
-                                                        }}>
-                                                            {/* Header Row: Red Pill + Name */}
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' }}>
-                                                                <span style={{
-                                                                    backgroundColor: '#b00b0b', // Deep red from image
-                                                                    color: 'white',
-                                                                    padding: '6px 20px',
-                                                                    borderRadius: '20px',
-                                                                    fontWeight: 600,
-                                                                    fontSize: '14px',
-                                                                    boxShadow: '0 2px 4px rgba(176, 11, 11, 0.2)'
-                                                                }}>
-                                                                    {rep.city}
-                                                                </span>
-                                                                <span style={{ fontSize: '16px', fontWeight: 700, color: '#1a1f2c' }}>
-                                                                    {rep.mission}
-                                                                </span>
-                                                            </div>
-
-                                                            {/* Details Grid */}
-                                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px', paddingLeft: '5px' }}>
-                                                                {/* Address */}
-                                                                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                                                                    <i className="fas fa-map-marker-alt" style={{ color: '#9ba7b6', marginTop: '4px', width: '16px' }}></i>
-                                                                    <span style={{ fontSize: '14px', color: '#545b64', lineHeight: '1.5' }}>{rep.address}</span>
-                                                                </div>
-
-                                                                {/* Contact Row (Email/Phone) */}
-                                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '30px', marginTop: '5px' }}>
-                                                                    {/* Placeholder for phone if data existed: 
-                                                                     <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                                                        <i className="fas fa-phone-alt" style={{ color: '#9ba7b6', width: '16px' }}></i>
-                                                                        <span style={{ fontSize: '14px', color: '#545b64' }}>+91 11 4139 9900</span>
-                                                                     </div> 
-                                                                     */}
-
-                                                                    {rep.emails && (
-                                                                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                                                            <i className="fas fa-envelope" style={{ color: '#9ba7b6', width: '16px' }}></i>
-                                                                            <a href={`mailto:${rep.emails}`} style={{ fontSize: '14px', color: '#1a1f2c', textDecoration: 'none' }}>{rep.emails}</a>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-
-                                                                {/* Hours (Data Placeholder Mockup to match specific request visual if real data isn't there) */}
-                                                                {/* Since actual data might not have hours, we omit or keep generic to avoid false info. 
-                                                                    However, to match the "Look" requested, we style the container such that if hours existed, they'd look like the image.
-                                                                */}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </>
-                                )}
+                                ))}
                             </div>
-                        </div>
+                        )}
 
+                        {/* 4. Help & Support */}
+                        {activeTab === 'help' && (
+                            <div style={containerStyle}>
+                                {getSections().internationalHelpAddress?.items?.map((item, idx) => (
+                                    <div key={idx} style={{ padding: '24px', borderBottom: '1px solid #eee' }}>
+                                        <h3 style={{ margin: '0 0 10px 0', fontSize: '18px' }}>{item.name}</h3>
+                                        <div style={{ fontSize: '14px', color: '#555' }}>
+                                            <p><strong>Location:</strong> {item.address}</p>
+                                            {item.phone && <p><strong>Emergency:</strong> {item.phone.join(', ')}</p>}
+                                            {item.email && <p><strong>Email:</strong> {item.email}</p>}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* 5. Logistic Partner */}
+                        {activeTab === 'logistic' && (
+                            <div style={containerStyle}>
+                                {getSections().logisticPartner?.items?.map((item, idx) => (
+                                    <div key={idx} style={{ padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <div style={{ fontSize: '18px', fontWeight: 700 }}>{item.name}</div>
+                                        <a href={item.url} target="_blank" rel="noreferrer" className="btn btn-outline" style={{ padding: '8px 20px', borderRadius: '4px', textDecoration: 'none', border: '1px solid #ccc', color: '#333' }}>
+                                            Visit Website <i className="fas fa-external-link-alt" style={{ marginLeft: '8px' }}></i>
+                                        </a>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                    </>
+                ) : !loading && countryCode ? (
+                    <div style={{ textAlign: 'center', padding: '50px', color: '#666' }}>
+                        No requirements data available for this country selection.
                     </div>
-                )}
+                ) : null}
+
             </div>
         </div>
     );

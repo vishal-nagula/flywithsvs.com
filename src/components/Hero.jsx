@@ -1,194 +1,134 @@
-
-import React, { useState } from 'react';
-import { api } from '../services/api';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import AgentRegistrationForm from './AgentRegistrationForm';
 
 const Hero = () => {
-    const [step, setStep] = useState(1);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [refId, setRefId] = useState(null);
-
-    // Step 1 Data
-    const [initData, setInitData] = useState({
-        companyName: '',
-        contactPersonFirstName: '',
-        contactPersonLastName: '',
-        email: '',
-        phone: ''
-    });
-
-    // Step 2 Data
-    const [otp, setOtp] = useState('');
-
-    // Step 3 Data
-    const [completeData, setCompleteData] = useState({
-        address: '',
-        website: '',
-        gstNumber: '',
-        panNumber: ''
-    });
-
-    const handleInitChange = (e) => {
-        setInitData({ ...initData, [e.target.name]: e.target.value });
-    };
-
-    const handleCompleteChange = (e) => {
-        setCompleteData({ ...completeData, [e.target.name]: e.target.value });
-    };
-
-    const handleStep1Submit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
-        try {
-            const response = await api.agentInitiate(initData);
-            setRefId(response.refId);
-            setStep(2);
-        } catch (err) {
-            setError(err.message || 'Failed to initiate registration');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleStep2Submit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
-        try {
-            await api.agentVerifyOtp({ refId, otp });
-            setStep(3);
-        } catch (err) {
-            setError(err.message || 'Invalid OTP');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleStep3Submit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
-        try {
-            await api.agentComplete({ refId, ...completeData });
-            setStep(4); // Success
-        } catch (err) {
-            setError(err.message || 'Failed to complete registration');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     return (
-        <section className="hero-section">
-            <div className="overlay"></div>
-            <div className="container hero-container">
-                <div className="hero-content">
-                    <h1>Explore the World <br /> With Confidence</h1>
-                    <p className="hero-sub">Your Trusted Partner for Visas, Flights, and Travel Planning.</p>
-                    <div className="hero-cta-buttons" style={{ marginTop: '30px', display: 'flex', gap: '15px' }}>
-                        <a href="/apply-visa" className="btn btn-primary" style={{ minWidth: '160px' }}>Apply for Visa</a>
-                        <a href="/b2b-register" className="btn btn-outline" style={{ minWidth: '160px', borderColor: '#fff' }}>Become an Agent</a>
-                    </div>
-                    <div className="whatsapp-float">
-                        <i className="fab fa-whatsapp"></i>
-                    </div>
-                </div>
-                <div className="hero-form">
-                    <div className="form-box">
-                        <h2>Become an Agent</h2>
-
-                        {step < 4 && <p style={{ textAlign: 'center', marginBottom: '15px', color: '#666', fontSize: '0.9rem' }}>Join our B2B network.</p>}
-
-                        {error && (
-                            <div style={{
-                                backgroundColor: '#fff5f5',
-                                border: '1px solid #dba6a6',
-                                color: '#d13212',
-                                padding: '8px',
-                                fontSize: '0.8rem',
-                                marginBottom: '10px',
-                                borderRadius: '4px'
+        <section className="hero-section" style={{
+            position: 'relative',
+            minHeight: '100vh',
+            background: 'linear-gradient(rgba(3, 29, 49, 0.75), rgba(3, 29, 49, 0.85)), url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2074&auto=format&fit=crop")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            color: 'white',
+            paddingTop: '100px', // Extra padding for header
+            paddingBottom: '80px'
+        }}>
+            <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+                <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '40px'
+                }}>
+                    {/* Left Content */}
+                    <div style={{ flex: '1 1 500px', maxWidth: '650px' }}>
+                        <div style={{
+                            display: 'inline-block',
+                            padding: '8px 16px',
+                            background: 'rgba(240, 145, 37, 0.15)',
+                            border: '1px solid rgba(240, 145, 37, 0.3)',
+                            borderRadius: '30px',
+                            marginBottom: '25px',
+                            backdropFilter: 'blur(5px)'
+                        }}>
+                            <span style={{
+                                color: '#f09125',
+                                fontWeight: '700',
+                                fontSize: '0.85rem',
+                                letterSpacing: '1px',
+                                textTransform: 'uppercase'
                             }}>
-                                {error}
+                                <i className="fas fa-check-circle" style={{ marginRight: '8px' }}></i>
+                                Leading Visa & Travel Partner
+                            </span>
+                        </div>
+
+                        <h1 style={{
+                            fontSize: '3.8rem',
+                            fontWeight: '800',
+                            lineHeight: '1.1',
+                            marginBottom: '25px',
+                            letterSpacing: '-2px',
+                            color: 'white'
+                        }}>
+                            Global Visa & <br />
+                            <span style={{ color: '#f09125' }}>Travel Solutions</span>
+                        </h1>
+
+                        <p style={{
+                            fontSize: '1.25rem',
+                            lineHeight: '1.6',
+                            marginBottom: '40px',
+                            opacity: '0.9',
+                            fontWeight: '300',
+                            maxWidth: '600px'
+                        }}>
+                            Professional visa processing, flight bookings, and travel assistance — delivered by experts you can trust.
+                        </p>
+
+                        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                            <Link to="/apply-visa" className="btn btn-primary" style={{
+                                fontSize: '1rem',
+                                padding: '14px 32px',
+                                background: 'var(--color-accent)',
+                                borderColor: 'var(--color-accent)',
+                                color: 'white'
+                            }}>
+                                Apply For Visa
+                            </Link>
+
+                            <a href="https://wa.me/1234567890" className="btn btn-outline" style={{
+                                fontSize: '1rem',
+                                padding: '14px 32px',
+                                color: 'white',
+                                borderColor: 'white',
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}>
+                                <i className="fas fa-comments" style={{ marginRight: '10px' }}></i>
+                                Talk to an Expert
+                            </a>
+                        </div>
+
+                        <div style={{ marginTop: '50px', display: 'flex', gap: '40px', borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '25px' }}>
+                            <div>
+                                <div style={{ fontSize: '1.8rem', fontWeight: '700', color: 'white' }}>10k+</div>
+                                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '1px' }}>Global Travelers</div>
                             </div>
-                        )}
-
-                        {step === 1 && (
-                            <form onSubmit={handleStep1Submit}>
-                                <div className="form-group">
-                                    <input type="text" name="companyName" placeholder="Agency Name" required value={initData.companyName} onChange={handleInitChange} />
-                                </div>
-                                <div style={{ display: 'flex', gap: '10px' }}>
-                                    <div className="form-group" style={{ flex: 1 }}>
-                                        <input type="text" name="contactPersonFirstName" placeholder="First Name" required value={initData.contactPersonFirstName} onChange={handleInitChange} />
-                                    </div>
-                                    <div className="form-group" style={{ flex: 1 }}>
-                                        <input type="text" name="contactPersonLastName" placeholder="Last Name" required value={initData.contactPersonLastName} onChange={handleInitChange} />
-                                    </div>
-                                </div>
-                                <div className="form-group">
-                                    <input type="email" name="email" placeholder="Email Address" required value={initData.email} onChange={handleInitChange} />
-                                </div>
-                                <div className="form-group">
-                                    <input type="tel" name="phone" placeholder="Mobile Number" required minLength="10" maxLength="15" value={initData.phone} onChange={handleInitChange} />
-                                </div>
-                                <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                                    {loading ? 'Processing...' : 'Register Now'}
-                                </button>
-                            </form>
-                        )}
-
-                        {step === 2 && (
-                            <form onSubmit={handleStep2Submit}>
-                                <p style={{ fontSize: '0.9rem', color: '#545b64', marginBottom: '15px', textAlign: 'center' }}>
-                                    Enter OTP sent to your email.
-                                </p>
-                                <div className="form-group">
-                                    <input type="text" name="otp" placeholder="Enter 6-digit OTP" required maxLength="6" value={otp} onChange={(e) => setOtp(e.target.value)} style={{ textAlign: 'center', letterSpacing: '2px' }} />
-                                </div>
-                                <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                                    {loading ? 'Verifying...' : 'Verify OTP'}
-                                </button>
-                                <div style={{ textAlign: 'center', marginTop: '10px' }}>
-                                    <button type="button" onClick={() => setStep(1)} style={{ background: 'none', border: 'none', color: '#095289', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.8rem' }}>
-                                        Edit Details
-                                    </button>
-                                </div>
-                            </form>
-                        )}
-
-                        {step === 3 && (
-                            <form onSubmit={handleStep3Submit}>
-                                <div className="form-group">
-                                    <textarea name="address" placeholder="Agency Address" required value={completeData.address} onChange={handleCompleteChange} style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '60px' }} />
-                                </div>
-                                <div className="form-group">
-                                    <input type="text" name="website" placeholder="Website (Optional)" value={completeData.website} onChange={handleCompleteChange} />
-                                </div>
-                                <div className="form-group">
-                                    <input type="text" name="gstNumber" placeholder="GST Number (Optional)" value={completeData.gstNumber} onChange={handleCompleteChange} />
-                                </div>
-                                <div className="form-group">
-                                    <input type="text" name="panNumber" placeholder="PAN Number (Optional)" value={completeData.panNumber} onChange={handleCompleteChange} />
-                                </div>
-                                <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                                    {loading ? 'Submitting...' : 'Complete Registration'}
-                                </button>
-                            </form>
-                        )}
-
-                        {step === 4 && (
-                            <div style={{ textAlign: 'center', padding: '10px 0' }}>
-                                <div style={{ fontSize: '3rem', color: '#28a745', marginBottom: '10px' }}>
-                                    <i className="fas fa-check-circle"></i>
-                                </div>
-                                <h3 style={{ fontSize: '1.1rem', marginBottom: '10px' }}>Registration Pending</h3>
-                                <p style={{ fontSize: '0.9rem', color: '#545b64' }}>
-                                    Your account is under review. You will receive an email upon approval.
-                                </p>
+                            <div>
+                                <div style={{ fontSize: '1.8rem', fontWeight: '700', color: 'white' }}>99%</div>
+                                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '1px' }}>Visa Success Rate</div>
                             </div>
-                        )}
+                        </div>
+                    </div>
+
+                    {/* Right Form */}
+                    <div style={{ flex: '1 1 400px', maxWidth: '480px', width: '100%' }}>
+                        <div style={{
+                            backgroundColor: 'white',
+                            borderRadius: '4px',
+                            overflow: 'hidden',
+                            boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+                            borderTop: '5px solid var(--color-accent)'
+                        }}>
+                            <div style={{ padding: '20px 30px 0' }}>
+                                <AgentRegistrationForm />
+                            </div>
+                            <div style={{
+                                backgroundColor: '#f8f9fa',
+                                padding: '15px',
+                                textAlign: 'center',
+                                fontSize: '0.85rem',
+                                color: '#6c757d',
+                                borderTop: '1px solid #e9ecef'
+                            }}>
+                                <i className="fas fa-lock" style={{ marginRight: '5px' }}></i> Secure Agent Registration
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

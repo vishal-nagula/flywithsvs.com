@@ -148,7 +148,6 @@ const AgentDashboard = () => {
                 <div className="nav-left">
                     <div className="nav-logo">
                         <img src="/src/assets/logo.png" alt="SVS" />
-                        <span>Console</span>
                     </div>
                 </div>
 

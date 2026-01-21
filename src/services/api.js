@@ -128,12 +128,35 @@ export const api = {
 
     // Agent Endpoints
     getVisaCountries: async () => {
-        const response = await fetch(`${BASE_URL}/admin/countries`, {
-            method: 'GET',
-            headers: getHeaders()
-        });
-        if (!response.ok) throw new Error('Failed to fetch country list');
-        return response.json();
+        try {
+            const response = await fetch(`${BASE_URL}/admin/countries`, {
+                method: 'GET',
+                headers: getHeaders()
+            });
+            if (!response.ok) throw new Error('Failed to fetch country list');
+            const data = await response.json();
+            if (Array.isArray(data) && data.length > 0) return data;
+            throw new Error('Empty country list');
+        } catch (error) {
+            console.warn("API getVisaCountries failed, using fallback list.", error);
+            // Fallback List for UI Stability
+            return [
+                { code: "US", name: "United States", countryName: "United States" },
+                { code: "GB", name: "United Kingdom", countryName: "United Kingdom" },
+                { code: "CA", name: "Canada", countryName: "Canada" },
+                { code: "AU", name: "Australia", countryName: "Australia" },
+                { code: "AE", name: "United Arab Emirates", countryName: "United Arab Emirates" },
+                { code: "SG", name: "Singapore", countryName: "Singapore" },
+                { code: "FR", name: "France", countryName: "France" },
+                { code: "DE", name: "Germany", countryName: "Germany" },
+                { code: "TH", name: "Thailand", countryName: "Thailand" },
+                { code: "MY", name: "Malaysia", countryName: "Malaysia" },
+                { code: "VN", name: "Vietnam", countryName: "Vietnam" },
+                { code: "ID", name: "Indonesia", countryName: "Indonesia" },
+                { code: "CN", name: "China", countryName: "China" },
+                { code: "JP", name: "Japan", countryName: "Japan" }
+            ].sort((a, b) => a.name.localeCompare(b.name));
+        }
     },
 
     getVisaRequirements: async (countryCode) => {
