@@ -1,30 +1,40 @@
 /* Global Design System - Fly With SVS */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* --- Color Palette --- */
-  /* Primary Brand Colors */
-  --color-primary: #031d31;
-  /* Deep Navy Blue */
-  --color-primary-light: #0d2c45;
-  --color-accent: #f09125;
-  /* Premium Orange */
-  --color-accent-hover: #d8801d;
+  /* --- Booking.com Design System --- */
+
+  /* Primary Brand (User Specified) */
+  --color-primary: #095289;
+  /* Lighter Navy for hover/interactive */
+  --color-primary-light: #0b6bb3;
+
+  /* Action/Conversion (User Specified Orange) */
+  --color-accent: #ef922b;
+  --color-accent-hover: #d67d1d;
+
+  /* Alert/Error - Keep semantic or use Orange */
+  --color-accent-secondary: #ef922b;
 
   /* Neutrals */
   --color-white: #ffffff;
-  --color-bg-light: #f8f9fa;
-  /* Light Blue-Grey */
-  --color-bg-dark: #111827;
-  /* Near Black */
-  --color-text-main: #1f2937;
-  /* Charcoal */
-  --color-text-muted: #6b7280;
-  /* Grey */
-  --color-border: #e5e7eb;
+  --color-bg-light: #f5f7fa;
+  /* Cool grey-white */
+  /* Light Grey */
+  --color-bg-dark: #002861;
+  /* Dark Navy */
+  /* Darker Navy (Footer) */
+  --color-text-main: #003580;
+  /* Use Navy for main text for strong branding, or keep dark grey */
+  /* Soft Black - Let's keep dark grey for readability but maybe cool textured */
+  --color-text-main: #1e293b;
+  --color-text-muted: #64748b;
+  /* Medium Grey */
+  --color-border: #e2e8f0;
 
-  /* --- Typography --- */
-  --font-heading: 'Manrope', 'Poppins', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  /* --- Typography (Montserrat) --- */
+  --font-heading: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   /* --- Spacing & Layout --- */
   --container-width: 1280px;

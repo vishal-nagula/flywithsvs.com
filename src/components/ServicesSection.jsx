@@ -3,93 +3,85 @@ import React from 'react';
 const ServicesSection = () => {
     const services = [
         {
-            icon: "fa-passport",
-            title: "Visa Services",
-            desc: "End-to-end processing for Tourist, Business, and Student visas with high success rates."
+            icon: "fa-headset",
+            title: "Dedicated Support",
+            desc: "WhatsApp No +91 84228 90090 and Contact Center No. +91 79695 14000"
         },
         {
-            icon: "fa-plane-departure",
-            title: "Flight Bookings",
-            desc: "Exclusive B2B rates and seamless ticketing for domestic and international travel."
+            icon: "fa-users", // or fa-network-wired
+            title: "Best Network",
+            desc: "Get Support from 50 + branches in India"
         },
         {
-            icon: "fa-umbrella-beach",
-            title: "Holiday Packages",
-            desc: "Curated global experiences and customized itineraries for every traveler."
-        },
-        {
-            icon: "fa-briefcase",
-            title: "Corporate Travel",
-            desc: "Dedicated travel management solutions for businesses and professional teams."
-        },
-        {
-            icon: "fa-file-invoice-dollar",
-            title: "Documentation",
-            desc: "Expert assistance with travel insurance, hotel proof, and itinerary planning."
+            icon: "fa-handshake",
+            title: "Transparent Pricing",
+            desc: "Get the detailed cost breakdown, from Visa Fees to VFS, GST & Service charges."
         }
     ];
 
     return (
-        <section className="section bg-light">
+        <section style={{ backgroundColor: 'white', padding: '80px 0' }}>
             <div className="container">
-                <div className="section-header">
-                    <span className="section-subtitle">Our Expertise</span>
-                    <h2>Comprehensive Travel Solutions</h2>
-                    <p className="text-muted" style={{ fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto' }}>
-                        We provide enterprise-grade travel infrastructure for individuals and businesses.
-                    </p>
+                <div className="section-header" style={{ marginBottom: '50px' }}>
+                    <h2 style={{
+                        fontSize: '2.5rem',
+                        fontWeight: '600',
+                        color: '#095289', // BRAND: Navy
+                        marginBottom: '16px'
+                    }}>
+                        What will You <span style={{ color: '#ef922b', fontWeight: '700' }}>Find Here?</span> {/* BRAND: Yellow */}
+                    </h2>
                 </div>
 
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
                     gap: '30px',
                     justifyContent: 'center'
                 }}>
                     {services.map((service, index) => (
                         <div key={index} className="card" style={{
+                            backgroundColor: 'white',
+                            padding: '40px 30px',
                             display: 'flex',
                             flexDirection: 'column',
-                            height: '100%',
-                            borderTop: '4px solid transparent',
-                            cursor: 'default'
-                        }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.borderTopColor = 'var(--color-accent)';
-                                e.currentTarget.style.transform = 'translateY(-5px)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.borderTopColor = 'transparent';
-                                e.currentTarget.style.transform = 'translateY(0)';
-                            }}
-                        >
+                            alignItems: 'flex-start',
+                            border: '1px solid #eef2f6',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+                            transition: 'transform 0.3s ease'
+                        }}>
                             <div style={{
-                                width: '64px',
-                                height: '64px',
-                                backgroundColor: 'rgba(3, 29, 49, 0.05)',
-                                color: 'var(--color-primary)',
-                                borderRadius: '4px',
+                                width: '60px',
+                                height: '60px',
+                                color: '#095289', // BRAND: Navy
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '1.75rem',
-                                marginBottom: '24px'
+                                fontSize: '2.5rem',
+                                marginBottom: '20px'
                             }}>
                                 <i className={`fas ${service.icon}`}></i>
                             </div>
-                            <h3 style={{ fontSize: '1.4rem', marginBottom: '12px' }}>{service.title}</h3>
-                            <p className="text-muted">{service.desc}</p>
-                            <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-                                <a href="#" style={{
-                                    color: 'var(--color-accent)',
-                                    fontWeight: '600',
-                                    fontSize: '0.9rem',
-                                    display: 'flex',
-                                    alignItems: 'center'
-                                }}>
-                                    Learn More <i className="fas fa-arrow-right" style={{ marginLeft: '8px', fontSize: '0.8rem' }}></i>
-                                </a>
-                            </div>
+
+                            {/* Decorative Line */}
+                            <div style={{ width: '40px', height: '3px', backgroundColor: '#333', marginBottom: '20px' }}></div>
+
+                            <h3 style={{
+                                fontSize: '1.4rem',
+                                marginBottom: '16px',
+                                color: '#333',
+                                fontWeight: '700'
+                            }}>
+                                {service.title}
+                            </h3>
+                            <p style={{
+                                color: '#666',
+                                fontSize: '1rem',
+                                lineHeight: '1.6',
+                                margin: 0
+                            }}>
+                                {service.desc}
+                            </p>
                         </div>
                     ))}
                 </div>
@@ -98,4 +90,4 @@ const ServicesSection = () => {
     );
 };
 
-export default ServicesSection;
+export default ServicesSection; // Ensure default export is present

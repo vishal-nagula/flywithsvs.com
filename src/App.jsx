@@ -5,10 +5,8 @@ import { BrowserRouter as Router, Routes, Route, Outlet, ScrollRestoration } fro
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ServicesSection from './components/ServicesSection';
-import VisaServicesSection from './components/VisaServicesSection';
+import BusinessFeaturesSection from './components/BusinessFeaturesSection';
 import ProcessSection from './components/ProcessSection';
-import TrustSection from './components/TrustSection';
-import TestimonialsSection from './components/TestimonialsSection';
 import CTASection from './components/CTASection';
 import Footer from './components/Footer';
 
@@ -17,6 +15,8 @@ import B2BLogin from './components/B2BLogin';
 import AgentDashboard from './components/AgentDashboard';
 import SetupPassword from './components/SetupPassword';
 import AgentRegistrationForm from './components/AgentRegistrationForm'; // Preserved Component
+import RegistrationModal from './components/RegistrationModal';
+import B2BRegister from './components/B2BRegister'; // New 3-step registration page
 
 // Layout component
 const MainLayout = () => {
@@ -31,15 +31,26 @@ const MainLayout = () => {
     );
 };
 
+
+
 function Home() {
+    const [showModal, setShowModal] = React.useState(false);
+
+    React.useEffect(() => {
+        // Show modal after a brief delay for better UX
+        const timer = setTimeout(() => {
+            setShowModal(true);
+        }, 1500);
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
         <>
+            <RegistrationModal isOpen={showModal} onClose={() => setShowModal(false)} />
             <Hero />
             <ServicesSection />
-            <VisaServicesSection />
-            <TrustSection />
+            <BusinessFeaturesSection />
             <ProcessSection />
-            <TestimonialsSection />
             <CTASection />
         </>
     );
@@ -56,7 +67,7 @@ function App() {
                     <Route path="/b2b-login" element={<B2BLogin />} />
                     <Route path="/b2b-register" element={
                         <div className="container" style={{ padding: '120px 20px 60px', maxWidth: '600px', margin: '0 auto' }}>
-                            <AgentRegistrationForm />
+                            <B2BRegister />
                         </div>
                     } />
                 </Route>

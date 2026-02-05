@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo.png';
+
 
 const Footer = () => {
     return (
-        <footer style={{ backgroundColor: 'var(--color-primary)', color: 'white', paddingTop: '80px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+        <footer style={{ backgroundColor: 'var(--color-bg-dark)', color: 'white', paddingTop: '60px', borderTop: 'none' }}>
             <div className="container">
                 <div style={{
                     display: 'grid',
@@ -17,7 +17,7 @@ const Footer = () => {
                         <div style={{ marginBottom: '25px' }}>
                             {/* Filter brightness to Make logo white for dark background */}
                             <img
-                                src={logo}
+                                src="/logo.png"
                                 alt="Fly With SVS"
                                 style={{ height: '40px', filter: 'brightness(0) invert(1)' }}
                             />

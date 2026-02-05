@@ -7,127 +7,154 @@ const Hero = () => {
         <section className="hero-section" style={{
             position: 'relative',
             minHeight: '100vh',
-            background: 'linear-gradient(rgba(3, 29, 49, 0.75), rgba(3, 29, 49, 0.85)), url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2074&auto=format&fit=crop")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundColor: 'var(--color-primary)', // Solid Navy
             display: 'flex',
             alignItems: 'center',
             color: 'white',
-            paddingTop: '100px', // Extra padding for header
+            paddingTop: '80px', // Header offset
             paddingBottom: '80px'
         }}>
-            <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+            {/* Subtle Gradient Overlay for depth */}
+            <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.1) 100%)',
+                zIndex: 1
+            }}></div>
+
+            <div className="container" style={{ position: 'relative', zIndex: 2, width: '100%' }}>
                 <div style={{
                     display: 'flex',
                     flexWrap: 'wrap',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    gap: '40px'
+                    gap: '60px'
                 }}>
                     {/* Left Content */}
-                    <div style={{ flex: '1 1 500px', maxWidth: '650px' }}>
+                    <div style={{ flex: '1 1 550px', maxWidth: '650px', paddingRight: '40px' }}>
+
+                        {/* Pre-heading Badge - refined */}
                         <div style={{
                             display: 'inline-block',
                             padding: '8px 16px',
-                            background: 'rgba(240, 145, 37, 0.15)',
-                            border: '1px solid rgba(240, 145, 37, 0.3)',
-                            borderRadius: '30px',
-                            marginBottom: '25px',
-                            backdropFilter: 'blur(5px)'
+                            background: 'rgba(255, 255, 255, 0.1)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            borderRadius: '50px', // softer round
+                            color: '#fff',
+                            fontSize: '0.8rem',
+                            fontWeight: '600',
+                            marginBottom: '32px',
+                            letterSpacing: '0.5px',
+                            backdropFilter: 'blur(4px)'
                         }}>
-                            <span style={{
-                                color: '#f09125',
-                                fontWeight: '700',
-                                fontSize: '0.85rem',
-                                letterSpacing: '1px',
-                                textTransform: 'uppercase'
-                            }}>
-                                <i className="fas fa-check-circle" style={{ marginRight: '8px' }}></i>
-                                Leading Visa & Travel Partner
-                            </span>
+                            <span style={{ color: 'var(--color-accent)' }}>●</span> Platform for Business
                         </div>
 
+                        {/* Main Heading - Refined & Smaller */}
                         <h1 style={{
-                            fontSize: '3.8rem',
-                            fontWeight: '800',
-                            lineHeight: '1.1',
-                            marginBottom: '25px',
-                            letterSpacing: '-2px',
-                            color: 'white'
+                            fontSize: '2.5rem', // Smaller text for premium feel
+                            fontWeight: '600', // Lighter weight
+                            lineHeight: '1.25',
+                            marginBottom: '20px',
+                            letterSpacing: '-0.01em',
+                            color: '#ffffff',
+                            fontFamily: 'var(--font-heading)',
+                            maxWidth: '650px'
                         }}>
-                            Global Visa & <br />
-                            <span style={{ color: '#f09125' }}>Travel Solutions</span>
+                            FlyWithSVS — Trusted B2B Travel Partner for Agents & Corporates.
                         </h1>
 
                         <p style={{
-                            fontSize: '1.25rem',
+                            fontSize: '0.95rem', // Smaller, more elegant body text
                             lineHeight: '1.6',
-                            marginBottom: '40px',
-                            opacity: '0.9',
-                            fontWeight: '300',
-                            maxWidth: '600px'
+                            marginBottom: '32px',
+                            color: 'rgba(255, 255, 255, 0.8)', // Softer white
+                            fontWeight: '400',
+                            maxWidth: '550px'
                         }}>
-                            Professional visa processing, flight bookings, and travel assistance — delivered by experts you can trust.
+                            Save time, reduce costs, and manage every booking with confidence.
                         </p>
 
-                        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                            <Link to="/apply-visa" className="btn btn-primary" style={{
-                                fontSize: '1rem',
-                                padding: '14px 32px',
-                                background: 'var(--color-accent)',
-                                borderColor: 'var(--color-accent)',
-                                color: 'white'
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                            <Link to="/register" className="btn" style={{
+                                padding: '12px 28px', // Smaller buttons
+                                fontSize: '0.9rem',
+                                borderRadius: '4px',
+                                textTransform: 'none',
+                                fontWeight: '600',
+                                backgroundColor: 'var(--color-accent)',
+                                color: '#0f172a',
+                                border: 'none',
+                                cursor: 'pointer',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                             }}>
-                                Apply For Visa
+                                Get Started
                             </Link>
-
-                            <a href="https://wa.me/1234567890" className="btn btn-outline" style={{
-                                fontSize: '1rem',
-                                padding: '14px 32px',
+                            <Link to="/register" className="btn" style={{
+                                padding: '12px 28px',
+                                fontSize: '0.9rem',
+                                borderRadius: '4px',
+                                textTransform: 'none',
+                                fontWeight: '500',
+                                background: 'rgba(255, 255, 255, 0.1)',
+                                border: '1px solid rgba(255, 255, 255, 0.15)',
                                 color: 'white',
-                                borderColor: 'white',
-                                display: 'flex',
-                                alignItems: 'center'
+                                backdropFilter: 'blur(4px)'
                             }}>
-                                <i className="fas fa-comments" style={{ marginRight: '10px' }}></i>
-                                Talk to an Expert
-                            </a>
+                                Register
+                            </Link>
                         </div>
 
-                        <div style={{ marginTop: '50px', display: 'flex', gap: '40px', borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '25px' }}>
-                            <div>
-                                <div style={{ fontSize: '1.8rem', fontWeight: '700', color: 'white' }}>10k+</div>
-                                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '1px' }}>Global Travelers</div>
+                        {/* Stats - Minimal */}
+                        <div style={{
+                            marginTop: '60px',
+                            display: 'flex',
+                            gap: '50px',
+                            borderTop: '1px solid rgba(255,255,255,0.1)',
+                            paddingTop: '24px'
+                        }}>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontSize: '1.8rem', fontWeight: '600', color: 'white', lineHeight: '1' }}>98%</span>
+                                <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginTop: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>Visa Approval</span>
                             </div>
-                            <div>
-                                <div style={{ fontSize: '1.8rem', fontWeight: '700', color: 'white' }}>99%</div>
-                                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '1px' }}>Visa Success Rate</div>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontSize: '1.8rem', fontWeight: '600', color: 'white', lineHeight: '1' }}>150+</span>
+                                <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginTop: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>Countries</span>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontSize: '1.8rem', fontWeight: '600', color: 'white', lineHeight: '1' }}>24/7</span>
+                                <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginTop: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>Support</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Form */}
-                    <div style={{ flex: '1 1 400px', maxWidth: '480px', width: '100%' }}>
+                    {/* Right Form - Styled as Floating Card */}
+                    <div style={{ flex: '1 1 400px', maxWidth: '480px' }}>
                         <div style={{
-                            backgroundColor: 'white',
-                            borderRadius: '4px',
-                            overflow: 'hidden',
-                            boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
-                            borderTop: '5px solid var(--color-accent)'
+                            background: 'white',
+                            borderRadius: '12px',
+                            padding: '0', // Form handles padding
+                            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                            overflow: 'hidden'
                         }}>
-                            <div style={{ padding: '20px 30px 0' }}>
-                                <AgentRegistrationForm />
-                            </div>
                             <div style={{
-                                backgroundColor: '#f8f9fa',
-                                padding: '15px',
-                                textAlign: 'center',
-                                fontSize: '0.85rem',
-                                color: '#6c757d',
-                                borderTop: '1px solid #e9ecef'
+                                padding: '20px 25px 0', // Reduced padding
+                                borderBottom: '1px solid #f1f5f9'
                             }}>
-                                <i className="fas fa-lock" style={{ marginRight: '5px' }}></i> Secure Agent Registration
+                                <h3 style={{
+                                    fontSize: '1.4rem',
+                                    color: '#0f172a',
+                                    marginBottom: '6px',
+                                    fontWeight: '700'
+                                }}>Get Started</h3>
+                                <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '15px' }}>Join the network of forward-thinking companies.</p>
                             </div>
+
+                            {/* We use specific corporate style now */}
+                            <AgentRegistrationForm customStyle="corporate-hero" hideTitle={true} />
                         </div>
                     </div>
                 </div>

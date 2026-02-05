@@ -57,7 +57,23 @@ export const api = {
     // Agent Registration
 
     // Agent Registration
+    // Agent Registration (New 2-Step Flow)
+    agentSendOtp: async (data) => {
+        // data: { email }
+        const response = await fetch(`${BASE_URL}/auth/agent/send-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to send OTP');
+        }
+        return response.json();
+    },
+
     agentInitiate: async (data) => {
+        // data: { email, otp, first_name, last_name, phone, company_name }
         const response = await fetch(`${BASE_URL}/auth/agent/initiate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -65,34 +81,35 @@ export const api = {
         });
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.message || 'Registration initiation failed');
+            throw new Error(error.message || 'Registration submission failed');
         }
         return response.json();
     },
 
+
     agentVerifyOtp: async (data) => {
+        // data: { email, otp }
         const response = await fetch(`${BASE_URL}/auth/agent/verify-otp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
+        const result = await response.json();
+        // API always returns 200, check 'valid' field
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'OTP verification failed');
+            throw new Error(result.message || 'OTP verification failed');
         }
-        return response.json();
+        return result; // { valid: true/false, nextStep: "...", message: "..." }
     },
 
+
     agentComplete: async (data) => {
+        // ... unused in new flow ...
         const response = await fetch(`${BASE_URL}/auth/agent/complete`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Registration completion failed');
-        }
         return response.json();
     },
 
@@ -165,6 +182,36 @@ export const api = {
             headers: getHeaders()
         });
         if (!response.ok) throw new Error('Failed to fetch visa requirements');
+        return response.json();
+    },
+
+    // V2 Public Endpoints for Apply Visa Flow
+    getPublicVisaCountries: async () => {
+        const response = await fetch(`${BASE_URL.replace('/v1', '/v2')}/public/visa/countries`, {
+            method: 'GET',
+            headers: getHeaders()
+        });
+        if (!response.ok) throw new Error('Failed to fetch public visa countries');
+        return response.json();
+    },
+
+    getPublicCountryRequirements: async (countryCode) => {
+        const response = await fetch(`${BASE_URL.replace('/v1', '/v2')}/public/visa/countries/${countryCode}/requirements`, {
+            method: 'GET',
+            headers: getHeaders()
+        });
+        if (!response.ok) throw new Error('Failed to fetch country requirements');
+        return response.json();
+    },
+
+    shareVisaRequirements: async (countryCode, payload) => {
+        // payload: { email, visaTypeId, jurisdictionId }
+        const response = await fetch(`${BASE_URL.replace('/v1', '/v2')}/public/visa/countries/${countryCode}/share`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error('Failed to send email');
         return response.json();
     },
 

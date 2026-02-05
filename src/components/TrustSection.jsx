@@ -1,81 +1,35 @@
 import React from 'react';
 
 const TrustSection = () => {
-    const features = [
-        {
-            title: "10+ Years",
-            subtitle: "Industry Experience",
-            icon: "fa-certificate"
-        },
-        {
-            title: "99.8%",
-            subtitle: "Approval Success",
-            icon: "fa-check-double"
-        },
-        {
-            title: "Global",
-            subtitle: "Partner Network",
-            icon: "fa-globe-americas"
-        },
-        {
-            title: "Secure",
-            subtitle: "Data Processing",
-            icon: "fa-lock"
-        }
+    // Placeholder logos for enterprise feel
+    const companies = [
+        "TechNova", "GlobalCorp", "AeroSystems", "FinEdge", "HealthPlus", "LogiChain"
     ];
 
     return (
-        <section className="section">
+        <section className="section" style={{ padding: '60px 0', borderBottom: '1px solid #e2e8f0' }}>
             <div className="container">
-                <div className="section-header">
-                    <span className="section-subtitle">Why Fly With SVS</span>
-                    <h2>The Trusted Choice for Global Travel</h2>
-                    <p className="text-muted" style={{ fontSize: '1.1rem' }}>
-                        We combine decades of expertise with cutting-edge technology to deliver seamless travel solutions.
-                    </p>
-                </div>
+
 
                 <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                    gap: '30px'
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                    gap: '60px',
+                    alignItems: 'center',
+                    opacity: 0.6
                 }}>
-                    {features.map((item, index) => (
+                    {companies.map((company, index) => (
                         <div key={index} style={{
+                            fontSize: '1.5rem',
+                            fontWeight: '800',
+                            color: '#095289', // BRAND: Navy
+                            fontFamily: 'var(--font-heading)',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '20px',
-                            padding: '24px',
-                            backgroundColor: '#f8f9fa',
-                            borderRadius: '4px',
-                            borderLeft: '4px solid var(--color-accent)'
+                            gap: '10px'
                         }}>
-                            <div style={{
-                                fontSize: '2rem',
-                                color: 'var(--color-primary)',
-                                opacity: 0.8
-                            }}>
-                                <i className={`fas ${item.icon}`}></i>
-                            </div>
-                            <div>
-                                <div style={{
-                                    fontSize: '1.5rem',
-                                    fontWeight: '800',
-                                    color: 'var(--color-primary)',
-                                    lineHeight: '1.1'
-                                }}>
-                                    {item.title}
-                                </div>
-                                <div style={{
-                                    fontSize: '0.9rem',
-                                    color: 'var(--color-text-muted)',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.5px',
-                                    marginTop: '5px'
-                                }}>
-                                    {item.subtitle}
-                                </div>
-                            </div>
+                            <i className="fas fa-layer-group" style={{ fontSize: '1.2rem' }}></i> {company}
                         </div>
                     ))}
                 </div>

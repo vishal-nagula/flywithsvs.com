@@ -14,14 +14,7 @@ const VisaServicesSection = () => {
     return (
         <section className="section">
             <div className="container">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '50px' }}>
-                    <div style={{ maxWidth: '600px' }}>
-                        <span className="section-subtitle">Global Access</span>
-                        <h2>Seamless Visa Processing</h2>
-                        <p className="text-muted" style={{ fontSize: '1.1rem' }}>
-                            Navigate complex visa requirements with our expert guidance. High success rates for major destinations.
-                        </p>
-                    </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '30px' }}>
                     <Link to="/visa-services" className="btn btn-outline" style={{ display: 'none', '@media (min-width: 768px)': { display: 'inline-flex' } }}>
                         View All Countries
                     </Link>

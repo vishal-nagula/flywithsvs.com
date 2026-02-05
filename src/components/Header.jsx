@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import logo from '../assets/logo.png';
-
 const Header = () => {
     const [scrolled, setScrolled] = useState(false);
     const location = useLocation();
@@ -23,18 +21,18 @@ const Header = () => {
     }, []);
 
     const headerClass = `fixed w-full z-50 transition-all duration-300 ${isHome && !scrolled
-            ? 'bg-transparent text-white py-6'
-            : 'bg-[#031d31] text-white py-4 shadow-md'
+        ? 'bg-transparent text-white py-6'
+        : 'bg-[#095289] text-white py-4 shadow-md' // Brand Navy
         }`;
 
     // Inline styles for this component to ensure it works even if tailwind/global css has issues
     const navLinkStyle = {
         color: 'inherit',
-        fontWeight: '500',
-        fontSize: '0.95rem',
+        fontWeight: '500', // Clean medium weight
+        fontSize: '0.85rem', // Slightly smaller for elegance
         textTransform: 'uppercase',
-        letterSpacing: '0.5px',
-        margin: '0 15px',
+        letterSpacing: '1.5px', // Wider spacing like reference
+        margin: '0 20px',
         textDecoration: 'none',
         position: 'relative',
         opacity: 0.9,
@@ -48,48 +46,52 @@ const Header = () => {
             left: 0,
             width: '100%',
             zIndex: 1000,
-            transition: 'all 0.3s ease',
-            backgroundColor: isHome && !scrolled ? 'transparent' : 'var(--color-primary)',
-            padding: isHome && !scrolled ? '25px 0' : '15px 0',
-            boxShadow: isHome && !scrolled ? 'none' : '0 2px 10px rgba(0,0,0,0.1)'
+            backgroundColor: '#ffffff', // White background
+            padding: '16px 0',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
         }}>
             <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Link to="/" className="logo">
-                    {/* Filter brightness to Make logo white for dark background */}
+                <Link to="/" className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+                    {/* Booking.com style usually text or simple logo. Keeping existing logo but removing filter if it helps, or keeping white invert. */}
                     <img
-                        src={logo}
+                        src="/logo.png"
                         alt="Fly With SVS"
-                        style={{ height: '45px', filter: 'brightness(0) invert(1)' }}
+                        style={{ height: '40px' }}
                     />
                 </Link>
 
                 <nav style={{ display: 'flex', alignItems: 'center' }}>
-                    <div className="desktop-menu" style={{ display: 'flex', alignItems: 'center', marginRight: '30px' }}>
-                        <Link to="/" style={navLinkStyle}>Home</Link>
-                        <Link to="/visa-services" style={navLinkStyle}>Visa Services</Link>
-                        <Link to="/corporate-travel" style={navLinkStyle}>Corporate</Link>
-                        <Link to="/about" style={navLinkStyle}>About</Link>
-                    </div>
 
-                    <div className="auth-buttons" style={{ display: 'flex', gap: '15px' }}>
-                        {/* Secondary CTA */}
-                        <a href="tel:+911234567890" style={{
-                            color: 'white',
+                    {/* Auth / Action Buttons - Booking.com puts these prominent */}
+                    <div className="auth-buttons" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+
+
+                        {/* Secondary Button (Sign In) - Blue Text/Border */}
+                        <Link to="/b2b-login" style={{
+                            padding: '8px 16px',
+                            fontSize: '0.9rem',
                             fontWeight: '600',
-                            display: 'flex',
-                            alignItems: 'center',
-                            marginRight: '20px',
-                            fontSize: '0.9rem'
+                            color: 'var(--color-primary)',
+                            backgroundColor: 'transparent',
+                            borderRadius: '2px', // Boxy
+                            textDecoration: 'none',
+                            border: '1px solid var(--color-primary)' // Blue border
                         }}>
-                            <i className="fas fa-phone-alt" style={{ marginRight: '8px', color: 'var(--color-accent)' }}></i>
-                            Support
-                        </a>
+                            Sign in
+                        </Link>
 
-                        <Link to="/b2b-login" className="btn btn-secondary" style={{
-                            padding: '10px 24px',
-                            fontSize: '0.85rem'
+                        {/* Primary Button (Register) - Yellow */}
+                        <Link to="/b2b-register" style={{
+                            padding: '8px 16px',
+                            fontSize: '0.9rem',
+                            fontWeight: '600',
+                            color: '#1a1a1a', // Dark Text
+                            backgroundColor: 'var(--color-accent)', // Yellow
+                            borderRadius: '2px', // Boxy
+                            textDecoration: 'none',
+                            border: '1px solid var(--color-accent)'
                         }}>
-                            Agent Login
+                            Register
                         </Link>
                     </div>
                 </nav>

@@ -147,7 +147,7 @@ const AgentDashboard = () => {
             <header className="global-nav">
                 <div className="nav-left">
                     <div className="nav-logo">
-                        <img src="/src/assets/logo.png" alt="SVS" />
+                        <img src="/logo.png" alt="SVS" />
                     </div>
                 </div>
 

@@ -3,87 +3,103 @@ import React from 'react';
 const ProcessSection = () => {
     const steps = [
         {
-            num: "01",
-            title: "Choose Service",
-            desc: "Select your destination and preferred visa type based on your travel purpose."
+            icon: "fas fa-laptop-house", // Login/Portal
+            title: "Login to the Portal",
+            desc: ""
         },
         {
-            num: "02",
-            title: "Submit Documents",
-            desc: "Upload the required documents securely through our encrypted portal."
+            icon: "fas fa-file-invoice", // Fill Application
+            title: "Fill the Application",
+            desc: ""
         },
         {
-            num: "03",
-            title: "Expert Verification",
-            desc: "Our visa specialists review your application to ensure 100% compliance."
-        },
-        {
-            num: "04",
-            title: "Approval & Delivery",
-            desc: "Receive your approved visa directly in your email and dashboard."
+            icon: "fas fa-paper-plane", // Submit
+            title: "Submit the Application",
+            desc: ""
         }
     ];
 
     return (
-        <section className="section bg-light">
+        <section className="section" style={{ backgroundColor: 'white', padding: '80px 0' }}>
             <div className="container">
-                <div className="section-header">
-                    <span className="section-subtitle">How It Works</span>
-                    <h2>Simple, Secure Process</h2>
-                    <p className="text-muted" style={{ fontSize: '1.1rem' }}>
-                        We've streamlined the visa application process to save you time and eliminate stress.
-                    </p>
+                <div className="section-header text-center" style={{ marginBottom: '60px' }}>
+                    <h2 style={{ fontSize: '2rem', fontWeight: '500', color: '#1a1a1a' }}>
+                        Step to Submit the <span style={{ color: '#ef922b', fontWeight: '700' }}>Visa!</span> {/* BRAND: Orange */}
+                    </h2>
                 </div>
 
                 <div style={{
                     position: 'relative',
-                    padding: '40px 0'
+                    padding: '20px 0'
                 }}>
-                    {/* Connection Line (Desktop) */}
-                    <div style={{
+                    {/* Dashed Connector Line (Visible on Desktop) */}
+                    <div className="connector-line" style={{
                         position: 'absolute',
-                        top: '80px',
-                        left: '10%',
-                        width: '80%',
-                        height: '2px',
-                        backgroundColor: '#e5e7eb',
+                        top: '40%',
+                        left: '15%',
+                        width: '70%',
+                        height: '100px',
                         zIndex: 0,
-                        display: 'none',
-                    }} className="process-line"></div>
+                        pointerEvents: 'none',
+                        display: 'none', // Hidden on mobile
+                    }}>
+                        {/* SVG for curved dashed line */}
+                        <svg width="100%" height="100%" viewBox="0 0 800 100" preserveAspectRatio="none">
+                            <path d="M0,50 Q200,80 400,50 T800,50" fill="none" stroke="#ccc" strokeWidth="2" strokeDasharray="10,10" />
+                        </svg>
+                    </div>
                     <style>{`
                         @media (min-width: 992px) {
-                            .process-line { display: block !important; }
+                            .connector-line { display: block !important; }
                         }
                     `}</style>
 
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                        gap: '40px',
+                        gridTemplateColumns: 'repeat(3, 1fr)', // Force 3 columns on desktop
+                        gap: '30px',
                         position: 'relative',
                         zIndex: 1
                     }}>
                         {steps.map((step, index) => (
-                            <div key={index} style={{ textAlign: 'center' }}>
+                            <div key={index} style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                textAlign: 'center'
+                            }}>
+                                {/* Icon Circle with Image feel */}
                                 <div style={{
-                                    width: '80px',
-                                    height: '80px',
-                                    margin: '0 auto 24px',
-                                    backgroundColor: 'white',
-                                    border: '2px solid var(--color-border)',
-                                    borderRadius: '50%',
+                                    width: '120px',
+                                    height: '120px',
+                                    marginBottom: '20px',
+                                    backgroundColor: 'white', // White bg
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontSize: '1.5rem',
-                                    fontWeight: '800',
-                                    color: 'var(--color-primary)',
-                                    boxShadow: '0 4px 10px rgba(0,0,0,0.05)'
+                                    position: 'relative'
                                 }}>
-                                    {step.num}
+                                    {/* Using FontAwesome with a large size and color/bg blob to simulate illustration */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        width: '100%',
+                                        height: '100%',
+                                        borderRadius: '50%',
+                                        background: 'radial-gradient(circle, rgba(0, 53, 128, 0.05) 0%, rgba(255,255,255,0) 70%)', // BRAND: Navy Tint
+                                        zIndex: -1
+                                    }}></div>
+                                    <i className={step.icon} style={{ fontSize: '4rem', color: '#095289' }}></i> {/* BRAND: Navy */}
                                 </div>
-                                <h3 style={{ fontSize: '1.2rem', marginBottom: '10px' }}>{step.title}</h3>
-                                <p className="text-muted" style={{ fontSize: '0.95rem', lineHeight: '1.6' }}>{step.desc}</p>
+
+                                <h3 style={{
+                                    fontSize: '1.3rem',
+                                    fontWeight: '700',
+                                    color: '#095289', // BRAND: Navy
+                                    maxWidth: '180px',
+                                    lineHeight: '1.4'
+                                }}>
+                                    {step.title}
+                                </h3>
                             </div>
                         ))}
                     </div>

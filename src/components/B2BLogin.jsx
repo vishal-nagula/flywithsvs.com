@@ -52,7 +52,7 @@ const B2BLogin = () => {
         <div style={{ backgroundColor: '#f2f3f3', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ marginBottom: '25px', textAlign: 'center' }}>
                 <Link to="/">
-                    <img src="/src/assets/logo.png" alt="SVS Holidays" style={{ maxHeight: '60px' }} />
+                    <img src="/logo.png" alt="SVS Holidays" style={{ maxHeight: '60px' }} />
                 </Link>
             </div>
 
